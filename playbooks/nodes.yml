@@ -1,0 +1,11 @@
+- hosts: nodes
+  become: true
+  vars_files:
+    - token
+
+  tasks:
+    - name: Copy Token to Nodes
+      copy: src={{ token_file }} dest=join_token
+
+    - name: Join Nodes with Master
+      shell: "`grep -i 'kubeadm join' join_token | cut -d '=' -f2 | sed 's/.$//'` --discovery-token-unsafe-skip-ca-verification"

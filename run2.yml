@@ -1,0 +1,2 @@
+- import_playbook: playbooks/master.yml
+- import_playbook: playbooks/nodes.yml

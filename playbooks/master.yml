@@ -1,0 +1,21 @@
+- hosts: master
+  become: true
+  vars_files:
+    - token
+
+  tasks:
+    - name: Initialize Kubernetes Cluster
+      shell: kubeadm init --pod-network-cidr=172.19.0.0/16 --service-cidr=172.20.0.0/24
+      register: output
+
+    - name: Store Logs and Generated Token
+      local_action: copy content={{ output.stdout }} dest={{ token_file }}
+
+    - name: Copy Required Files
+      shell: |
+        mkdir -p ~/.kube #-------------- didnt work!
+        cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        chown $(id -u):$(id -g) $HOME/.kube/config
+
+    - name: Install Flannel
+      command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
